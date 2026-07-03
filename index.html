@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Jan Lönnqvist · Senior Visual Designer · DEPT®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #050505;
+    --accent: #ff6a00;
+    --accent-dim: #cc5500;
+    --text: #ffffff;
+    --text-dim: rgba(255,255,255,0.55);
+    --text-muted: rgba(255,255,255,0.25);
+    --border: rgba(255,255,255,0.06);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+}
+
+#scroll-spacer { height: 1200vh; }
+#webgl { position: fixed; inset: 0; z-index: 1; }
+
+.cursor {
+    position: fixed; width: 24px; height: 24px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%; pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s, background 0.3s, border-color 0.3s;
+    mix-blend-mode: difference;
+}
+.cursor.hover { width: 64px; height: 64px; background: rgba(255,106,0,0.08); border-color: var(--accent); }
+.cursor-dot {
+    position: fixed; width: 5px; height: 5px; background: var(--accent);
+    border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+}
+
+#loader {
+    position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    transition: opacity 0.8s ease, visibility 0.8s;
+}
+#loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-logo {
+    height: 40px; width: auto;
+    animation: loaderPulse 1.5s ease-in-out infinite;
+}
+.loader-bar { width: 120px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+.loader-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-dim)); animation: loaderFill 1.8s ease-in-out forwards; }
+@keyframes loaderPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes loaderFill { to { width: 100%; } }
+
+nav {
+    position: fixed; top: 0; left: 0; right: 0; padding: 28px 48px;
+    display: flex; justify-content: space-between; align-items: center; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 14px; }
+.nav-logo svg { height: 22px; width: auto; }
+.nav-logo span { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+.nav-links { display: flex; gap: 36px; }
+.nav-links a {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); text-decoration: none; transition: color 0.3s; cursor: none;
+}
+.nav-links a:hover { color: var(--accent); }
+
+.zone {
+    position: fixed; z-index: 50; pointer-events: none; opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.zone.active { opacity: 1; pointer-events: auto; }
+
+.zone-hero { top: 50%; left: 50%; transform: translate(-50%, -50%) translateY(30px); text-align: center; max-width: 700px; }
+.zone-hero.active { transform: translate(-50%, -50%) translateY(0); }
+.hero-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 28px; display: flex; align-items: center; justify-content: center; gap: 14px;
+}
+.hero-label::before { content: ''; width: 36px; height: 1.5px; background: linear-gradient(90deg, var(--accent), var(--accent-dim)); }
+.hero-label::after { content: ''; width: 36px; height: 1.5px; background: linear-gradient(90deg, var(--accent-dim), var(--accent)); }
+.hero-name {
+    font-family: 'Montserrat', sans-serif; font-size: clamp(64px, 12vw, 130px);
+    font-weight: 900; line-height: 0.88; letter-spacing: -0.04em; margin-bottom: 28px;
+}
+.hero-name .outline { -webkit-text-stroke: 1.5px var(--text); -webkit-text-fill-color: transparent; }
+.hero-role { font-size: 15px; font-weight: 400; color: var(--text-dim); line-height: 1.7; max-width: 480px; margin: 0 auto; }
+.hero-role strong { color: var(--text); font-weight: 500; }
+
+.zone-side { top: 50%; max-width: 440px; transform: translateY(-50%); }
+.zone-side.left { left: 6vw; transform: translateY(-50%) translateX(-60px); }
+.zone-side.left.active { transform: translateY(-50%) translateX(0); }
+.zone-side.right { right: 6vw; text-align: right; transform: translateY(-50%) translateX(60px); }
+.zone-side.right.active { transform: translateY(-50%) translateX(0); }
+
+.zone-label {
+    font-size: 9px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 12px;
+}
+.zone-side.right .zone-label { justify-content: flex-end; }
+.zone-label::before { content: ''; width: 24px; height: 1px; }
+.zone-label.neon { color: var(--accent); }
+.zone-label.neon::before { background: var(--accent); }
+.zone-label.dim { color: var(--accent-dim); }
+.zone-label.dim::before { background: var(--accent-dim); }
+.zone-label.grad { background: linear-gradient(90deg, var(--accent), var(--accent-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.zone-label.grad::before { background: linear-gradient(90deg, var(--accent), var(--accent-dim)); }
+
+.zone-title {
+    font-family: 'Montserrat', sans-serif; font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 16px;
+}
+.zone-text { font-size: 14px; font-weight: 400; color: var(--text-dim); line-height: 1.8; }
+.zone-text .hl { color: var(--text); font-weight: 500; }
+.zone-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.zone-side.right .zone-tags { justify-content: flex-end; }
+.tag {
+    padding: 8px 16px; font-size: 11px; font-weight: 500; letter-spacing: 0.02em;
+    border-radius: 100px; border: 1px solid var(--border); color: var(--text-dim); transition: all 0.3s;
+}
+.tag:hover { border-color: var(--accent); color: var(--accent); }
+.tag.neon { border-color: rgba(255,106,0,0.25); color: var(--accent); }
+.tag.dim { border-color: rgba(204,85,0,0.25); color: var(--accent-dim); }
+.zone-period { font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.04em; margin-bottom: 6px; }
+
+.zone-cta { top: 50%; left: 50%; transform: translate(-50%, -50%) translateY(40px); text-align: center; max-width: 560px; }
+.zone-cta.active { transform: translate(-50%, -50%) translateY(0); }
+.cta-title {
+    font-family: 'Montserrat', sans-serif; font-size: clamp(40px, 6vw, 72px);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1; margin-bottom: 16px;
+}
+.cta-title .grad { background: linear-gradient(135deg, var(--accent), var(--accent-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.cta-text { font-size: 15px; color: var(--text-dim); line-height: 1.7; margin-bottom: 36px; }
+.cta-buttons { display: flex; gap: 14px; justify-content: center; }
+.btn {
+    padding: 15px 32px; font-size: 11px; font-weight: 600; font-family: inherit;
+    letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+    border-radius: 6px; transition: all 0.3s; cursor: none;
+}
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dim)); color: #050505; border: none; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,106,0,0.25); }
+.btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.progress-bar { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-dim)); z-index: 101; width: 0%; transition: width 0.1s; }
+.zone-marker { position: fixed; right: 48px; bottom: 48px; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); z-index: 100; }
+.zone-marker .num { color: var(--accent); margin-right: 10px; font-weight: 600; }
+.scroll-hint {
+    position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); z-index: 100; opacity: 1; transition: opacity 0.5s;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.scroll-hint.hidden { opacity: 0; }
+.scroll-line { width: 1px; height: 32px; background: linear-gradient(to bottom, var(--accent), transparent); animation: scrollPulse 2s infinite; }
+@keyframes scrollPulse { 0%, 100% { opacity: 0.3; transform: scaleY(0.6); } 50% { opacity: 1; transform: scaleY(1); } }
+
+.glow { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(120px); }
+.glow-neon { width: 500px; height: 500px; background: rgba(255,106,0,0.05); top: -10%; right: -5%; }
+.glow-dark { width: 400px; height: 400px; background: rgba(204,85,0,0.04); bottom: -10%; left: -5%; }
+
+@media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-dot { display: none; }
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .zone-hero { top: 50%; left: 50%; right: auto; max-width: 90vw; }
+    .zone-side { max-width: 85vw; }
+    .zone-side.left { left: 5vw; }
+    .zone-side.right { right: 5vw; }
+    .zone-marker { right: 24px; bottom: 24px; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+    <svg class="loader-logo" viewBox="0 795 709 195" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M365.918 795.034V989.23H418.356V929.9H449.425C497.694 929.9 528.732 911.43 528.732 862.46C528.732 813.49 497.694 795.034 449.425 795.034H365.918ZM444.12 889.33H418.326V835.59H444.12C465.474 835.59 474.351 843.42 474.351 862.46C474.351 881.5 465.489 889.33 444.12 889.33Z" fill="white"/><path d="M534.426 795.034V840.37H595.158V989.23H647.597V840.37H708.359V795.034H534.426Z" fill="white"/><path d="M250.999 911.73H338.899V869.74H250.999V839.24H348.628V795.019H198.575V989.22H351.108V945H250.984V911.72H251.014L250.999 911.73Z" fill="white"/><path d="M80.697 795.034H0V989.23H80.697C156.12 989.23 185.828 946.97 185.828 892.11C185.828 837.25 156.149 795.034 80.697 795.034ZM79.89 944.74H52.408V839.52H79.89C109.539 839.52 130.894 853.79 130.894 892.11C130.894 930.43 109.539 944.7 79.89 944.7V944.74Z" fill="white"/><path d="M698.69 965.65C698.69 961.08 695.776 958.94 690.77 958.94H679.427V979.34H685.584V972.63H689.111L692.802 979.34H699.497L695.029 971.42C697.091 970.57 698.645 968.23 698.645 965.65H698.69ZM689.425 968.05H685.629V963.75H689.425C691.382 963.75 692.443 964.26 692.443 965.72C692.443 967.35 691.397 968.07 689.425 968.07V968.05Z" fill="white"/><path d="M688.648 949.88C677.813 949.88 669.041 958.76 669.041 969.61C669.041 980.46 677.813 989.23 688.648 989.23C699.482 989.23 708.344 980.46 708.344 969.61C708.344 958.76 699.482 949.88 688.648 949.88ZM688.648 985.78C679.875 985.78 672.837 978.56 672.837 969.58C672.837 960.6 679.875 953.31 688.648 953.31C697.42 953.31 704.563 960.63 704.563 969.58C704.563 978.53 697.45 985.78 688.648 985.78Z" fill="white"/></svg>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<div class="glow glow-neon"></div>
+<div class="glow glow-dark"></div>
+
+<canvas id="webgl"></canvas>
+<div class="progress-bar" id="progressBar"></div>
+
+<nav>
+    <div class="nav-logo"><svg viewBox="0 795 709 195" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M365.918 795.034V989.23H418.356V929.9H449.425C497.694 929.9 528.732 911.43 528.732 862.46C528.732 813.49 497.694 795.034 449.425 795.034H365.918ZM444.12 889.33H418.326V835.59H444.12C465.474 835.59 474.351 843.42 474.351 862.46C474.351 881.5 465.489 889.33 444.12 889.33Z" fill="white"/><path d="M534.426 795.034V840.37H595.158V989.23H647.597V840.37H708.359V795.034H534.426Z" fill="white"/><path d="M250.999 911.73H338.899V869.74H250.999V839.24H348.628V795.019H198.575V989.22H351.108V945H250.984V911.72H251.014L250.999 911.73Z" fill="white"/><path d="M80.697 795.034H0V989.23H80.697C156.12 989.23 185.828 946.97 185.828 892.11C185.828 837.25 156.149 795.034 80.697 795.034ZM79.89 944.74H52.408V839.52H79.89C109.539 839.52 130.894 853.79 130.894 892.11C130.894 930.43 109.539 944.7 79.89 944.7V944.74Z" fill="white"/><path d="M698.69 965.65C698.69 961.08 695.776 958.94 690.77 958.94H679.427V979.34H685.584V972.63H689.111L692.802 979.34H699.497L695.029 971.42C697.091 970.57 698.645 968.23 698.645 965.65H698.69ZM689.425 968.05H685.629V963.75H689.425C691.382 963.75 692.443 964.26 692.443 965.72C692.443 967.35 691.397 968.07 689.425 968.07V968.05Z" fill="white"/><path d="M688.648 949.88C677.813 949.88 669.041 958.76 669.041 969.61C669.041 980.46 677.813 989.23 688.648 989.23C699.482 989.23 708.344 980.46 708.344 969.61C708.344 958.76 699.482 949.88 688.648 949.88ZM688.648 985.78C679.875 985.78 672.837 978.56 672.837 969.58C672.837 960.6 679.875 953.31 688.648 953.31C697.42 953.31 704.563 960.63 704.563 969.58C704.563 978.53 697.45 985.78 688.648 985.78Z" fill="white"/></svg><span>· Visual Designer</span></div>
+    <div class="nav-links">
+        <a href="#" onclick="scrollToZone(0);return false;">Start</a>
+        <a href="#" onclick="scrollToZone(5);return false;">Experience</a>
+        <a href="#" onclick="scrollToZone(9);return false;">Contact</a>
+    </div>
+</nav>
+
+<!-- Zone 0: Hero -->
+<div class="zone zone-hero active" data-zone="0">
+    <div class="hero-label">Senior Visual Designer · Amsterdam</div>
+    <h1 class="hero-name">JAN<br><span class="outline">LÖNNQVIST</span></h1>
+    <p class="hero-role">10+ years of <strong>visual design, art direction, motion, and digital campaign production</strong> for global brands across 40+ markets. The creative engine: from e-commerce platforms to social content to interactive prototypes.</p>
+</div>
+
+<!-- Zone 1: Visual Design Fit -->
+<div class="zone zone-side left" data-zone="1">
+    <div class="zone-label neon">Visual + Motion</div>
+    <h2 class="zone-title">Design &<br>Direction</h2>
+    <p class="zone-text">Visual design and art direction for <span class="hl">digital campaigns, e-commerce, and interactive content</span>. Motion design: short-form video, social content, animated assets. Interactive prototyping in Figma. AI-enabled creative tools integrated into daily workflow.</p>
+    <div class="zone-tags">
+        <span class="tag neon">Art Direction</span>
+        <span class="tag neon">Motion</span>
+        <span class="tag">Prototyping</span>
+        <span class="tag">AI Tools</span>
+    </div>
+</div>
+
+<!-- Zone 2: GLS Group -->
+<div class="zone zone-side right" data-zone="2">
+    <div class="zone-label dim">Current Role</div>
+    <div class="zone-period">2024 – Apr 2025</div>
+    <h2 class="zone-title">GLS Group</h2>
+    <p class="zone-text">Group Graphic Designer. <span class="hl">Visual systems and campaign production across 40+ countries.</span> Built creative for CORE 2030 brand strategy. Digital campaigns, social content, video, and brand systems with AI-integrated workflows.</p>
+    <div class="zone-tags">
+        <span class="tag dim">40+ Countries</span>
+        <span class="tag dim">Brand Systems</span>
+        <span class="tag">Events</span>
+        <span class="tag">Presentations</span>
+    </div>
+</div>
+
+<!-- Zone 3: DHL -->
+<div class="zone zone-side left" data-zone="3">
+    <div class="zone-label neon">Freelance</div>
+    <div class="zone-period">Feb 2024 – Aug 2024</div>
+    <h2 class="zone-title">DHL Supply<br>Chain</h2>
+    <p class="zone-text">Senior Graphic Designer. <span class="hl">Multi-channel campaigns across 12+ markets.</span> Paid media assets, social content, email, web, and event collateral. Launch campaign achieved <span class="hl">20% of targeted leads in month one</span>. Campaign asset delivery across customer journey stages.</p>
+    <div class="zone-tags">
+        <span class="tag neon">12+ Markets</span>
+        <span class="tag neon">Multi-Channel</span>
+        <span class="tag">Web</span>
+        <span class="tag">Events</span>
+    </div>
+</div>
+
+<!-- Zone 4: Rituals -->
+<div class="zone zone-side right" data-zone="4">
+    <div class="zone-label dim">Full-time</div>
+    <div class="zone-period">Sep 2022 – Feb 2024</div>
+    <h2 class="zone-title">Rituals</h2>
+    <p class="zone-text">Visual Specialist. <span class="hl">In-store campaign design, packaging, and point-of-sale visuals</span> across global retail. Translating brand narrative into consistent visual execution across physical touchpoints. Key projects: <span class="hl">Hammam and Legend of the Dragon</span> seasonal campaigns.</p>
+    <div class="zone-tags">
+        <span class="tag dim">Packaging</span>
+        <span class="tag dim">In-Store</span>
+        <span class="tag">Visual Identity</span>
+        <span class="tag">Campaigns</span>
+    </div>
+</div>
+
+<!-- Zone 5: HelloFresh -->
+<div class="zone zone-side left" data-zone="5">
+    <div class="zone-label neon">Contract</div>
+    <div class="zone-period">Apr 2022 – Sep 2022</div>
+    <h2 class="zone-title">HelloFresh</h2>
+    <p class="zone-text">Creative / DTP. Recipe card design and production across <span class="hl">Benelux and France</span>. Cross-functional collaboration with marketing, product, and development teams. Managing multiple projects simultaneously in a fast-paced environment.</p>
+    <div class="zone-tags">
+        <span class="tag neon">Production</span>
+        <span class="tag neon">Cross-Functional</span>
+        <span class="tag">Benelux & France</span>
+    </div>
+</div>
+
+<!-- Zone 6: Valve & IKEA -->
+<div class="zone zone-side right" data-zone="6">
+    <div class="zone-label dim">Foundation</div>
+    <div class="zone-period">2013 – 2020</div>
+    <h2 class="zone-title">Agency &<br>In-House</h2>
+    <p class="zone-text"><span class="hl">Art Director at Valve</span>: concept development, visual storytelling, and client presentations. <span class="hl">Graphic Artist at IKEA Group</span>: brand guidelines and campaigns. Plus five years across Helsinki agencies building deep expertise in <span class="hl">layout, grid systems, typography, and production</span>.</p>
+    <div class="zone-tags">
+        <span class="tag dim">Art Direction</span>
+        <span class="tag dim">IKEA</span>
+        <span class="tag">Valve</span>
+        <span class="tag">Agency</span>
+    </div>
+</div>
+
+<!-- Zone 7: Capabilities -->
+<div class="zone zone-side left" data-zone="7">
+    <div class="zone-label grad">Capabilities</div>
+    <h2 class="zone-title">What I<br>Deliver</h2>
+    <p class="zone-text"><span class="hl">Visual design, art direction, and motion.</span> Figma (prototyping, design systems), Adobe CC, After Effects, Premiere Pro. <span class="hl">AI-enabled creative tools</span> integrated into production. Typography mastery, digital craft. Comfortable presenting creative concepts directly to client stakeholders. Fluent English, native Finnish. Based in Amsterdam.</p>
+    <div class="zone-tags">
+        <span class="tag neon">Figma</span>
+        <span class="tag dim">Adobe CC</span>
+        <span class="tag neon">After Effects</span>
+        <span class="tag dim">Premiere Pro</span>
+        <span class="tag">Lottie</span>
+    </div>
+</div>
+
+<!-- Zone 8: Why DEPT -->
+<div class="zone zone-side right" data-zone="8">
+    <div class="zone-label grad">Why DEPT®</div>
+    <h2 class="zone-title">Pioneering<br>Together</h2>
+    <p class="zone-text">DEPT® operates at the intersection of technology and marketing. A decade of <span class="hl">visual design, art direction, and campaign production</span> for global brands is a direct match. AI tools already in my daily workflow.<br><br>From multi-market campaigns at GLS and DHL to premium brand work at Rituals, I bring <span class="hl">visual craft, motion capabilities, and production speed</span> to ambitious accounts. Amsterdam-based, hybrid-ready.</p>
+</div>
+
+<!-- Zone 9: CTA -->
+<div class="zone zone-cta" data-zone="9">
+    <h2 class="cta-title">Let's<br><span class="grad">Build</span></h2>
+    <p class="cta-text">Ready to bring visual design, art direction, and motion to ambitious accounts at DEPT® in Amsterdam.</p>
+    <div class="cta-buttons">
+        <a href="https://definitelynotjan.github.io/Portfolio/" target="_blank" class="btn btn-primary">View Portfolio</a>
+        <a href="mailto:jan.lonnqvist@windowslive.com" class="btn btn-secondary">Get in Touch</a>
+    </div>
+</div>
+
+<div class="zone-marker"><span class="num">01</span><span id="zoneLabel">START</span></div>
+<div class="scroll-hint" id="scrollHint">Scroll<div class="scroll-line"></div></div>
+
+<div id="scroll-spacer"></div>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+let mouseX = innerWidth / 2, mouseY = innerHeight / 2;
+let cursorX = mouseX, cursorY = mouseY;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+document.querySelectorAll('a, .btn').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+// ── LOADER ──
+setTimeout(() => document.getElementById('loader').classList.add('done'), 2200);
+
+// ── THREE.JS SETUP ──
+const canvas = document.getElementById('webgl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x050505);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x050505, 0.012);
+
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 20);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.6, 0.4, 0.85));
+
+// ── ENVIRONMENT MAP ──
+const pmremGen = new THREE.PMREMGenerator(renderer);
+const envScene = new THREE.Scene();
+envScene.add(new THREE.Mesh(
+    new THREE.IcosahedronGeometry(100, 4),
+    new THREE.ShaderMaterial({
+        side: THREE.BackSide, uniforms: {},
+        vertexShader: `varying vec3 vP; void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+        fragmentShader: `varying vec3 vP; void main(){
+            vec3 d=normalize(vP); float t=d.y*.5+.5;
+            vec3 c=mix(vec3(.01,.01,.02),vec3(.03,.03,.04),t);
+            c+=vec3(1.,1.,1.)*smoothstep(.85,1.,dot(d,normalize(vec3(1.,.8,-.5))))*.35;
+            c+=vec3(.7,.7,.8)*smoothstep(.88,1.,dot(d,normalize(vec3(-.8,.3,.7))))*.25;
+            gl_FragColor=vec4(c,1.);}`
+    })
+));
+const envMap = pmremGen.fromScene(envScene, 0.04).texture;
+scene.environment = envMap;
+
+// ── DEPT® STAR LOGOMARK (3D extruded SVG) ──
+const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 709 698">
+    <path d="M708.104 301.689V396.239H508.632L670.67 514.027L616.154 591.123L453.161 472.558L516.164 666.725L427.173 697.943L375.616 539.088C371.581 526.386 369.624 512.862 369.624 499.113C369.624 440.862 404.936 378.276 468.628 353.948V343.995C404.936 319.666 369.624 257.066 369.624 198.829C369.624 185.081 371.596 171.557 375.616 158.854L427.173 0L516.164 31.218L453.161 225.385L616.154 106.819L670.67 183.915L508.632 301.704H708.104V301.689Z"/>
+    <path d="M0.239014 301.689V396.224H199.711L37.674 514.027L92.189 591.123L255.183 472.558L192.179 666.71L281.17 697.943L332.727 539.088C336.762 526.386 338.72 512.862 338.72 499.113C338.72 440.862 303.407 378.276 239.716 353.948V343.995C303.407 319.666 338.72 257.066 338.72 198.829C338.72 185.081 336.747 171.557 332.727 158.854L281.17 0L192.179 31.218L255.183 225.385L92.189 106.819L37.674 183.915L199.711 301.704H0.239014V301.689Z"/>
+</svg>`;
+
+const svgLoader = new SVGLoader();
+const svgData = svgLoader.parse(svgMarkup);
+
+const starMat = new THREE.MeshPhysicalMaterial({
+    color: 0x111111,
+    metalness: 0.95,
+    roughness: 0.04,
+    envMap,
+    envMapIntensity: 3.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.02,
+    iridescence: 1.0,
+    iridescenceIOR: 1.8,
+    iridescenceThicknessRange: [100, 600],
+    sheen: 0.5,
+    sheenColor: new THREE.Color(0xffffff),
+});
+
+const starGroup = new THREE.Group();
+const extrudeSettings = {
+    depth: 60,
+    bevelEnabled: true,
+    bevelThickness: 10,
+    bevelSize: 6,
+    bevelSegments: 8,
+    curveSegments: 48
+};
+
+svgData.paths.forEach(path => {
+    const shapes = SVGLoader.createShapes(path);
+    shapes.forEach(shape => {
+        const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+        starGroup.add(new THREE.Mesh(geo, starMat));
+    });
+});
+
+// Center and scale
+const box = new THREE.Box3().setFromObject(starGroup);
+const center = box.getCenter(new THREE.Vector3());
+const size = box.getSize(new THREE.Vector3());
+const maxDim = Math.max(size.x, size.y, size.z);
+const scale = 8 / maxDim;
+starGroup.position.sub(center);
+const starWrapper = new THREE.Group();
+starWrapper.add(starGroup);
+starWrapper.scale.setScalar(scale);
+starWrapper.scale.y *= -1;
+scene.add(starWrapper);
+
+// ── GHOST TRAILS ──
+const ghostStars = [];
+const ghostCount = 8;
+for (let i = 0; i < ghostCount; i++) {
+    const ghostGroup = new THREE.Group();
+    svgData.paths.forEach(path => {
+        const shapes = SVGLoader.createShapes(path);
+        shapes.forEach(shape => {
+            const geo = new THREE.ExtrudeGeometry(shape, {
+                ...extrudeSettings,
+                bevelSegments: 4,
+                curveSegments: 24
+            });
+            const ghostMat = new THREE.MeshPhysicalMaterial({
+                color: 0x111111,
+                metalness: 0.9,
+                roughness: 0.1,
+                envMap,
+                envMapIntensity: 1.5,
+                transparent: true,
+                opacity: 0.12 - i * 0.012,
+                clearcoat: 0.5,
+                iridescence: 0.6,
+                iridescenceIOR: 1.5,
+                iridescenceThicknessRange: [100, 500],
+            });
+            ghostGroup.add(new THREE.Mesh(geo, ghostMat));
+        });
+    });
+    ghostGroup.position.sub(center);
+    const ghostWrapper = new THREE.Group();
+    ghostWrapper.add(ghostGroup);
+    ghostWrapper.scale.setScalar(scale);
+    ghostWrapper.scale.y *= -1;
+    scene.add(ghostWrapper);
+    ghostStars.push(ghostWrapper);
+}
+
+// ── ORBITING DOTS ──
+const dotMat = new THREE.MeshPhysicalMaterial({
+    color: 0xff6a00,
+    metalness: 0.3,
+    roughness: 0.2,
+    emissive: 0xff6a00,
+    emissiveIntensity: 0.4,
+    envMap,
+    envMapIntensity: 1.0,
+});
+
+const bigDot = new THREE.Mesh(new THREE.SphereGeometry(0.45, 32, 32), dotMat);
+scene.add(bigDot);
+
+const smallDot = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), dotMat.clone());
+scene.add(smallDot);
+
+const orbitDots = [];
+for (let i = 0; i < 6; i++) {
+    const sz = 0.08 + Math.random() * 0.15;
+    const dm = new THREE.MeshPhysicalMaterial({
+        color: i % 2 === 0 ? 0xff6a00 : 0xcc5500,
+        metalness: 0.3, roughness: 0.2,
+        emissive: i % 2 === 0 ? 0xff6a00 : 0xcc5500,
+        emissiveIntensity: 0.6,
+        transparent: true, opacity: 0.7,
+    });
+    const dot = new THREE.Mesh(new THREE.SphereGeometry(sz, 16, 16), dm);
+    scene.add(dot);
+    orbitDots.push({ mesh: dot, radius: 4.5 + Math.random() * 3, speed: 0.3 + Math.random() * 0.5, offset: Math.random() * Math.PI * 2, yOffset: (Math.random() - 0.5) * 4 });
+}
+
+// ── ORBITING RINGS ──
+const ringGroup = new THREE.Group();
+const ringMat1 = new THREE.MeshStandardMaterial({
+    color: 0xff6a00, emissive: 0xff6a00, emissiveIntensity: 0.3,
+    metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.3
+});
+const ringMat2 = new THREE.MeshStandardMaterial({
+    color: 0xcc5500, emissive: 0xcc5500, emissiveIntensity: 0.3,
+    metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.2
+});
+const ring1 = new THREE.Mesh(new THREE.TorusGeometry(5.5, 0.015, 16, 120), ringMat1);
+ring1.rotation.x = Math.PI * 0.5;
+ringGroup.add(ring1);
+const ring2 = new THREE.Mesh(new THREE.TorusGeometry(6.8, 0.01, 16, 120), ringMat2);
+ring2.rotation.x = Math.PI * 0.35;
+ring2.rotation.z = Math.PI * 0.2;
+ringGroup.add(ring2);
+scene.add(ringGroup);
+
+// ── FLOATING PARTICLES ──
+const particleCount = 180;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(particleCount * 3);
+const pBasePos = [];
+for (let i = 0; i < particleCount; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 8 + Math.random() * 20;
+    pPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    pPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    pPos[i*3+2] = r * Math.cos(phi);
+    pBasePos.push({ x: pPos[i*3], y: pPos[i*3+1], z: pPos[i*3+2] });
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+const pCanvas = document.createElement('canvas'); pCanvas.width = 32; pCanvas.height = 32;
+const pCtx = pCanvas.getContext('2d');
+const pGrad = pCtx.createRadialGradient(16,16,0,16,16,16);
+pGrad.addColorStop(0, 'rgba(255,255,255,1)');
+pGrad.addColorStop(0.4, 'rgba(255,255,255,0.4)');
+pGrad.addColorStop(1, 'rgba(255,255,255,0)');
+pCtx.fillStyle = pGrad; pCtx.fillRect(0,0,32,32);
+scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({
+    size: 0.12, map: new THREE.CanvasTexture(pCanvas), color: 0xff6a00,
+    transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true
+})));
+
+// ── LIGHTING ──
+scene.add(new THREE.AmbientLight(0x111118, 0.5));
+const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+keyLight.position.set(8, 12, 10); scene.add(keyLight);
+const neonLight = new THREE.PointLight(0xffffff, 2.0, 40);
+neonLight.position.set(-8, 5, 8); scene.add(neonLight);
+const dimLight = new THREE.PointLight(0xddddf0, 1.2, 40);
+dimLight.position.set(8, -5, -6); scene.add(dimLight);
+const accentLight = new THREE.PointLight(0xffffff, 0.8, 30);
+accentLight.position.set(-4, -6, 5); scene.add(accentLight);
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+rimLight.position.set(-5, -3, -10); scene.add(rimLight);
+
+// ── SCROLL ──
+let scroll = 0, targetScroll = 0;
+const scrollHeight = document.getElementById('scroll-spacer').offsetHeight - innerHeight;
+const zones = document.querySelectorAll('.zone');
+const zoneLabel = document.getElementById('zoneLabel');
+const scrollHint = document.getElementById('scrollHint');
+const progressBar = document.getElementById('progressBar');
+const zoneNames = ['START', 'VISUAL DESIGN', 'GLS GROUP', 'DHL', 'RITUALS', 'HELLOFRESH', 'FOUNDATION', 'TOOLKIT', 'WHY DEPT', 'CONNECT'];
+const zoneThresholds = [0, 0.08, 0.17, 0.27, 0.37, 0.47, 0.57, 0.67, 0.78, 0.90];
+let currentZone = 0;
+
+window.addEventListener('scroll', () => { targetScroll = scrollY / scrollHeight; }, { passive: true });
+window.scrollToZone = function(i) { window.scrollTo({ top: zoneThresholds[i] * scrollHeight, behavior: 'smooth' }); };
+
+// ── ANIMATION ──
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
+    scroll += (targetScroll - scroll) * 0.06;
+
+    if (!isMobile) {
+        cursorX += (mouseX - cursorX) * 0.1; cursorY += (mouseY - cursorY) * 0.1;
+        cursor.style.left = cursorX + 'px'; cursor.style.top = cursorY + 'px';
+        cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px';
+    }
+
+    progressBar.style.width = (scroll * 100) + '%';
+
+    // Zones
+    let newZone = 0;
+    for (let i = zoneThresholds.length - 1; i >= 0; i--) { if (scroll >= zoneThresholds[i] - 0.03) { newZone = i; break; } }
+    if (newZone !== currentZone) { currentZone = newZone; zoneLabel.textContent = zoneNames[currentZone]; }
+    zones.forEach((z, i) => z.classList.toggle('active', i === currentZone));
+    scrollHint.classList.toggle('hidden', scroll > 0.03);
+    document.querySelector('.zone-marker .num').textContent = String(currentZone + 1).padStart(2, '0');
+
+    // ── STAR MOTION ──
+    const scrollRot = scroll * Math.PI * 4;
+    starWrapper.rotation.y = time * 0.2 + scrollRot;
+    starWrapper.rotation.x = Math.sin(time * 0.15) * 0.3 + scroll * 1.2;
+    starWrapper.rotation.z = Math.cos(time * 0.1) * 0.15 + Math.sin(scroll * Math.PI * 3) * 0.4;
+
+    const scalePulse = 1.0 + Math.sin(time * 0.5) * 0.05;
+    starWrapper.scale.setScalar(scale * scalePulse);
+    starWrapper.scale.y = -scale * scalePulse;
+
+    starMat.iridescenceThicknessRange = [100 + scroll * 300, 600 - scroll * 200];
+    starMat.sheenColor.setHSL(0, 0, 0.7 + Math.sin(time * 0.3) * 0.1);
+
+    // ── GHOST TRAILS ──
+    for (let i = 0; i < ghostCount; i++) {
+        const delay = (i + 1) * 0.12;
+        const pt = time - delay;
+        const ps = Math.max(0, scroll - delay * 0.02);
+        const psr = ps * Math.PI * 4;
+        ghostStars[i].rotation.y = pt * 0.2 + psr;
+        ghostStars[i].rotation.x = Math.sin(pt * 0.15) * 0.3 + ps * 1.2;
+        ghostStars[i].rotation.z = Math.cos(pt * 0.1) * 0.15 + Math.sin(ps * Math.PI * 3) * 0.4;
+        const gs = scale * scalePulse * (1 + (i + 1) * 0.03);
+        ghostStars[i].scale.setScalar(gs);
+        ghostStars[i].scale.y = -gs;
+    }
+
+    // ── ORBITING DOTS ──
+    const bigAngle = time * 0.4 + scroll * Math.PI * 2;
+    const bigR = 4.2 + Math.sin(time * 0.6) * 0.5;
+    bigDot.position.set(Math.cos(bigAngle) * bigR, Math.sin(bigAngle) * bigR + Math.sin(time * 0.3) * 0.8, Math.sin(bigAngle * 0.7) * 2);
+
+    const smAngle = -time * 0.6 + scroll * Math.PI * 3;
+    const smR = 3.5 + Math.cos(time * 0.8) * 0.4;
+    smallDot.position.set(Math.cos(smAngle) * smR, Math.sin(smAngle) * smR + Math.cos(time * 0.5) * 1.2, Math.cos(smAngle * 0.5) * 1.5);
+
+    for (const od of orbitDots) {
+        const a = time * od.speed + od.offset + scroll * Math.PI;
+        od.mesh.position.set(Math.cos(a) * od.radius, Math.sin(a) * od.radius * 0.6 + od.yOffset + Math.sin(time * 0.3 + od.offset) * 0.5, Math.sin(a * 0.7) * od.radius * 0.3);
+    }
+
+    // ── RINGS ──
+    ringGroup.rotation.y = time * 0.06 + scroll * 0.5;
+    ringGroup.rotation.x = Math.sin(time * 0.04) * 0.1;
+    ring1.rotation.z = time * 0.1;
+    ring2.rotation.z = -time * 0.07;
+
+    // ── PARTICLES ──
+    const pArr = pGeo.attributes.position.array;
+    for (let i = 0; i < particleCount; i++) {
+        const idx = i * 3, bp = pBasePos[i];
+        pArr[idx] = bp.x + Math.sin(time * 0.2 + i * 0.5) * 0.5;
+        pArr[idx+1] = bp.y + Math.cos(time * 0.15 + i * 0.3) * 0.4;
+        pArr[idx+2] = bp.z + Math.sin(time * 0.1 + i * 0.2) * 0.3;
+    }
+    pGeo.attributes.position.needsUpdate = true;
+
+    neonLight.intensity = 2.0 + Math.sin(time * 0.5) * 0.4;
+    dimLight.intensity = 1.2 + Math.cos(time * 0.4) * 0.3;
+    accentLight.intensity = 0.8 + Math.sin(time * 0.6) * 0.2;
+
+    // ── CAMERA ──
+    const mx = (mouseX / innerWidth - 0.5) * 2;
+    const my = (mouseY / innerHeight - 0.5) * -2;
+    const camAngle = scroll * Math.PI * 3;
+    const camRadius = 18 + Math.sin(scroll * Math.PI * 2.5) * 4 - scroll * 3;
+    const camHeight = Math.sin(scroll * Math.PI * 2) * 3.5 + Math.cos(scroll * Math.PI * 3.4) * 2;
+    camera.position.x = Math.sin(camAngle) * camRadius + mx * 1.2;
+    camera.position.y = camHeight + my * 0.8;
+    camera.position.z = Math.cos(camAngle) * camRadius;
+    camera.lookAt(0, 0, 0);
+
+    composer.render();
+}
+animate();
+
+window.addEventListener('resize', () => {
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+    composer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
